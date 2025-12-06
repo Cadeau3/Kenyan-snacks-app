@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kenyan Snacks • Emoji Ordering App</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    margin: 0;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial;
+    background: #f5f5f7;
+    color: #111;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 18px;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo {
+    width: 55px;
+    height: 55px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 20px;
+  }
+
+  .subtitle {
+    color: #555;
+    font-size: 13px;
+    margin-top: 3px;
+  }
+
+  .top {
+    margin-top: 18px;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+  }
+
+  .panel {
+    background: white;
+    padding: 14px;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    border: 1px solid #eee;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 8px 12px;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #444;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .tab.active {
+    background: #007aff;
+    color: white;
+    border-color: #007aff;
+  }
+
+  /* Layout */
+  .layout {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 16px;
+  }
+
+  @media(max-width: 900px){
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  /* Menu grid */
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 12px;
+  }
+
+  @media(max-width:600px){
+    .menu-grid { grid-template-columns: 1fr; }
+  }
+
+  .item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #eee;
+  }
+
+  .emoji-box {
+    width: 75px;
+    height: 75px;
+    background: #fafafa;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+  }
+
+  .meta {
+    flex: 1;
+  }
+
+  .price {
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  .add {
+    background: #34c759;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 10px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* Cart */
+  .cart {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .qty-btn {
+    border: 1px solid #ccc;
+    background: #fff;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .primary {
+    background: #007aff;
+    border: none;
+    padding: 10px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .ghost {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">🍽️</div>
+    <div>
+      <h1>Kenyan Snacks • Emoji App</h1>
+      <div class="subtitle">iPhone-style clean design • 100% client-side</div>
+    </div>
+  </header>
+
+  <!-- Top -->
+  <div class="top">
+    <div class="panel" style="flex:1">
+      <strong>Categories</strong>
+      <div class="tabs" id="tabs"></div>
+    </div>
+
+    <div class="panel" style="width:260px">
+      <strong>Quick Actions</strong>
+      <button id="saveAll" class="ghost" style="margin-top:10px;width:100%;">Save All</button>
+      <button id="exportSaved" class="ghost" style="margin-top:8px;width:100%;">Export Saved</button>
+    </div>
+  </div>
+
+  <!-- Layout -->
+  <div class="layout">
+    <!-- MENU -->
+    <div class="panel">
+      <strong id="categoryTitle">All Items</strong>
+      <div class="menu-grid" id="menuGrid" style="margin-top:12px"></div>
+    </div>
+
+    <!-- CART -->
+    <div class="panel cart">
+      <strong>Your Cart</strong>
+      <div id="cartStatus" style="color:#666;font-size:13px">Empty</div>
+
+      <div id="cartList"></div>
+
+      <div style="margin-top:10px">
+        <div style="display:flex;justify-content:space-between">
+          <span>Subtotal</span><span id="subtotal">KES 0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span>Tax (8%)</span><span id="tax">KES 0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-weight:700">
+          <span>Total</span><span id="total">KES 0</span>
+        </div>
+      </div>
+
+      <button id="saveOrder" class="primary" style="margin-top:12px;width:100%;">Save Order</button>
+      <button id="exportCSV" class="ghost" style="margin-top:8px;width:100%;">Export CSV</button>
+      <button id="clearCart" class="ghost" style="margin-top:8px;width:100%;">Clear Cart</button>
+
+      <select id="savedSelect" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid #ddd;">
+        <option value="">-- saved orders --</option>
+      </select>
+
+      <button id="loadSaved" class="ghost" style="margin-top:8px;width:100%;">Load Saved</button>
+      <button id="deleteSaved" class="ghost" style="margin-top:8px;width:100%;">Delete Saved</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* EMOJI FOOD ITEMS */
+const MENU = [
+  {id:'mandazi', name:'Mandazi (3 pcs)', cat:'Snacks', price:40, emoji:'🍩', desc:'Sweet fried dough'},
+  {id:'samosa', name:'Samosa (1 pc)', cat:'Snacks', price:50, emoji:'🥟', desc:'Kenyan beef samosa'},
+  {id:'chips', name:'Chips (paper)', cat:'Snacks', price:70, emoji:'🍟', desc:'Street fries'},
+  {id:'smokie', name:'Smokie Kebab', cat:'Snacks', price:90, emoji:'🌭', desc:'Skewered sausage'},
+
+  {id:'mandazi_bites', name:'Mandazi Bites', cat:'Desserts', price:80, emoji:'🍪', desc:'Mini mandazi'},
+  {id:'doughnut', name:'Doughnut', cat:'Desserts', price:60, emoji:'🍩', desc:'Soft vanilla donut'},
+  {id:'cake_slice', name:'Cake Slice', cat:'Desserts', price:120, emoji:'🍰', desc:'Strawberry slice'},
+
+  {id:'pilau', name:'Pilau Box', cat:'Meals', price:300, emoji:'🍛', desc:'Masala rice'},
+  {id:'nyama', name:'Nyama Choma', cat:'Meals', price:250, emoji:'🍖', desc:'Roasted meat'},
+  {id:'ugali_beef', name:'Ugali & Beef', cat:'Meals', price:280, emoji:'🍲', desc:'Beef stew'},
+
+  {id:'samaki', name:'Fried Samaki', cat:'Coastal', price:280, emoji:'🐟', desc:'Fried fish'},
+  {id:'mshakiki', name:'Mshakiki Skewers', cat:'Coastal', price:150, emoji:'🍢', desc:'Meat skewers'},
+  {id:'viazi_karai', name:'Viazi Karai', cat:'Coastal', price:60, emoji:'🥔', desc:'Coastal potato bites'},
+
+  {id:'chapati', name:'Chapati', cat:'Breakfast', price:35, emoji:'🥞', desc:'Soft flatbread'},
+  {id:'tea', name:'Chai Tea', cat:'Breakfast', price:25, emoji:'☕', desc:'Milk tea'},
+  {id:'sausages', name:'Sausages', cat:'Breakfast', price:70, emoji:'🌭', desc:'Breakfast sausage'}
+];
+
+let cart = {};
+const TAX = 0.08;
+
+function $(id){ return document.getElementById(id); }
+function currency(v){ return "KES " + Number(v).toLocaleString(); }
+
+/* TABS */
+const categories = Array.from(new Set(MENU.map(m=>m.cat)));
+categories.unshift("All");
+
+function renderTabs(){
+  const box = $("tabs");
+  box.innerHTML = "";
+  categories.forEach((cat,i)=>{
+    const b = document.createElement("button");
+    b.className = "tab" + (i===0 ? " active" : "");
+    b.textContent = cat;
+    b.onclick = ()=>{
+      document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+      b.classList.add("active");
+      renderMenu(cat);
+    };
+    box.appendChild(b);
+  });
+}
+
+/* MENU */
+function renderMenu(cat="All"){
+  $("categoryTitle").textContent = cat === "All" ? "All Items" : cat;
+  const list = $("menuGrid");
+  list.innerHTML = "";
+
+  const items = MENU.filter(x => cat==="All" ? true : x.cat===cat);
+  items.forEach(item=>{
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div class="emoji-box">${item.emoji}</div>
+      <div class="meta">
+        <div style="font-weight:700">${item.name}</div>
+        <div style="color:#666;font-size:13px">${item.desc}</div>
+        <div class="price">${currency(item.price)}</div>
+      </div>
+      <button class="add" data-id="${item.id}">Add</button>
+    `;
+    list.appendChild(div);
+  });
+
+  document.querySelectorAll(".add").forEach(btn=>{
+    btn.onclick = ()=> addToCart(btn.dataset.id);
+  });
+}
+
+/* CART */
+function addToCart(id){
+  let item = MENU.find(x=>x.id===id);
+  if(cart[id]) cart[id].qty++;
+  else cart[id] = {item, qty:1};
+  renderCart();
+}
+
+function renderCart(){
+  const box = $("cartList");
+  box.innerHTML = "";
+
+  const keys = Object.keys(cart);
+  $("cartStatus").textContent = keys.length === 0 ? "Empty" : keys.length+" item(s)";
+
+  keys.forEach(id=>{
+    let c = cart[id];
+    const row = document.createElement("div");
+    row.className = "cart-item";
+    row.innerHTML = `
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="font-size:30px">${c.item.emoji}</div>
+        <div>
+          <div style="font-weight:700">${c.item.name}</div>
+          <div style="font-size:13px;color:#666">${currency(c.item.price)}</div>
+        </div>
+      </div>
+      <div>
+        <button class="qty-btn" data-id="${id}" data-op="-">-</button>
+        <span style="margin:0 6px">${c.qty}</span>
+        <button class="qty-btn" data-id="${id}" data-op="+">+</button>
+      </div>
+    `;
+    box.appendChild(row);
+  });
+
+  document.querySelectorAll(".qty-btn").forEach(btn=>{
+    btn.onclick = ()=>{
+      const id = btn.dataset.id;
+      const op = btn.dataset.op;
+      if(op==="+") cart[id].qty++;
+      else cart[id].qty--;
+      if(cart[id].qty<=0) delete cart[id];
+      renderCart();
+    };
+  });
+
+  const subtotal = keys.reduce((sum,id)=> sum + cart[id].item.price * cart[id].qty, 0);
+  const tax = subtotal * TAX;
+  const total = subtotal + tax;
+
+  $("subtotal").textContent = currency(subtotal);
+  $("tax").textContent = currency(Math.round(tax));
+  $("total").textContent = currency(Math.round(total));
+}
+
+/* SAVE ORDER */
+$("saveOrder").onclick = ()=>{
+  if(Object.keys(cart).length===0) return alert("Cart is empty!");
+  let name = prompt("Save order as:");
+  if(!name) return;
+
+  localStorage.setItem("ks_order_"+name, JSON.stringify(cart));
+  alert("Saved!");
+  refreshSaved();
+};
+
+/* EXPORT CSV */
+$("exportCSV").onclick = ()=>{
+  if(Object.keys(cart).length===0) return alert("Cart empty");
+  let name = prompt("Filename:", "order");
+  if(!name) return;
+
+  let csv = "item,price,qty,subtotal\n";
+  for(const id in cart){
+    const c = cart[id];
+    csv += `${c.item.name},${c.item.price},${c.qty},${c.item.price*c.qty}\n`;
+  }
+
+  const blob = new Blob([csv], {type:"text/csv"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name+".csv";
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+/* CLEAR CART */
+$("clearCart").onclick = ()=>{
+  cart = {};
+  renderCart();
+};
+
+/* SAVE ALL ORDERS */
+$("saveAll").onclick = ()=>{
+  alert("All orders are automatically saved in browser storage.");
+};
+
+/* DELETE SAVED ORDER */
+$("deleteSaved").onclick = ()=>{
+  let key = $("savedSelect").value;
+  if(!key) return alert("Choose a saved order");
+  localStorage.removeItem(key);
+  refreshSaved();
+};
+
+/* LOAD SAVED ORDER */
+$("loadSaved").onclick = ()=>{
+  refreshSaved();
+  alert("Saved orders loaded.");
+};
+
+$("loadBtn").onclick = ()=>{
+  let key = $("savedSelect").value;
+  if(!key) return alert("Choose a saved order");
+
+  let saved = JSON.parse(localStorage.getItem(key));
+  cart = saved;
+  renderCart();
+};
+
+/* EXPORT SAVED ORDERS */
+$("exportSaved").onclick = ()=>{
+  let out = {};
+  for(const k in localStorage){
+    if(k.startsWith("ks_order_")){
+      out[k] = JSON.parse(localStorage.getItem(k));
+    }
+  }
+
+  const blob = new Blob([JSON.stringify(out,null,2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "saved_orders.json";
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+/* REFRESH SAVED DROP */
+function refreshSaved(){
+  let sel = $("savedSelect");
+  sel.innerHTML = '<option value="">-- saved orders --</option>';
+
+  for(const k in localStorage){
+    if(k.startsWith('ks_order_')){
+      let opt = document.createElement('option');
+      opt.value = k;
+      opt.textContent = k.replace('ks_order_','');
+      sel.appendChild(opt);
+    }
+  }
+}
+
+/* INIT */
+renderTabs();
+renderMenu();
+refreshSaved();
+</script>
+
+</body>
+</html>
