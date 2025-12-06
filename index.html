@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Kenyan Snacks — Clean Menu & Ordering</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f7f8;
+    --card:#ffffff;
+    --muted:#6b7280;
+    --accent:#0f766e;
+    --accent-2:#0ea5a0;
+    --radius:12px;
+    --shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:#0b2826}
+  .container{max-width:1100px;margin:22px auto;padding:20px}
+  header{display:flex;align-items:center;gap:12px}
+  .logo{width:56px;height:56px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);box-shadow:var(--shadow)}
+  h1{margin:0;font-size:20px}
+  .subtitle{color:var(--muted);font-size:13px;margin-top:6px}
+  .top{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:12px}
+  .panel{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);border:1px solid rgba(10,15,20,0.03)}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .tab{padding:8px 12px;border-radius:999px;background:#fff;border:1px solid rgba(10,15,20,0.04);cursor:pointer;color:var(--muted);font-weight:600}
+  .tab.active{background:var(--accent);color:#fff;border:0}
+  .layout{display:grid;grid-template-columns:1fr 380px;gap:14px;margin-top:14px}
+  @media(max-width:980px){.layout{grid-template-columns:1fr}}
+  .menu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.menu-grid{grid-template-columns:1fr}}
+  .item{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;border:1px solid rgba(10,15,20,0.03);background:#fff}
+  .thumb{width:96px;height:72px;border-radius:8px;overflow:hidden;flex-shrink:0;background:#f3f4f6;display:flex;align-items:center;justify-content:center}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .meta{flex:1;display:flex;flex-direction:column;gap:6px}
+  .title{font-weight:700}
+  .desc{font-size:13px;color:var(--muted)}
+  .price{font-weight:700;color:#0b4b47}
+  .add{background:var(--accent-2);border:0;padding:8px 10px;border-radius:8px;color:#fff;cursor:pointer;font-weight:700}
+  .cart{display:flex;flex-direction:column;gap:10px}
+  .cart-list{max-height:380px;overflow:auto}
+  .cart-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid rgba(10,15,20,0.03)}
+  .qty{display:flex;gap:6px;align-items:center}
+  .btn-ghost{background:#fff;border:1px solid rgba(10,15,20,0.06);padding:8px;border-radius:8px;cursor:pointer}
+  .primary{background:var(--accent);border:0;padding:10px;border-radius:10px;color:#fff;cursor:pointer;font-weight:700}
+  .muted-small{font-size:13px;color:var(--muted)}
+  .footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+  .small-note{font-size:13px;color:var(--muted);margin-top:8px}
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">KS</div>
+      <div>
+        <h1>Kenyan Snacks — Clean Menu</h1>
+        <div class="subtitle">A simple demo for local snack ordering — client-side only.</div>
+      </div>
+    </header>
+
+    <div class="top">
+      <div class="panel" style="flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <strong>Categories</strong>
+            <div class="small-note">Filter the menu by category</div>
+          </div>
+          <div class="muted-small" id="countBadge">0 items</div>
+        </div>
+        <div style="margin-top:10px" class="tabs" id="tabs"></div>
+      </div>
+
+      <div style="width:260px" class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong>Quick actions</strong><div class="muted-small">Save & export</div></div>
+        </div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+          <button id="saveBtn" class="btn-ghost">Save Order</button>
+          <button id="exportAllBtn" class="btn-ghost">Export Saved</button>
+          <button id="clearLocalBtn" class="btn-ghost">Clear Saved</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="layout" role="main" aria-labelledby="menu">
+      <!-- Menu -->
+      <div>
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong id="categoryTitle">All Items</strong><div class="muted-small">Click Add to include item in cart</div></div>
+          </div>
+
+          <div style="margin-top:12px" id="menuGrid" class="menu-grid"></div>
+        </div>
+
+        <div style="margin-top:12px" class="small-note">This demo uses public images for illustration. The app is client-side and does not process payments.</div>
+      </div>
+
+      <!-- Cart -->
+      <aside>
+        <div class="panel cart">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Your Cart</strong><div class="muted-small" id="cartStatus">Empty</div></div>
+            <div class="muted-small">Tax 8%</div>
+          </div>
+
+          <div class="cart-list" id="cartList" style="margin-top:10px"></div>
+
+          <div style="margin-top:8px">
+            <div style="display:flex;justify-content:space-between"><div class="muted-small">Subtotal</div><div id="subtotal">KES 0</div></div>
+            <div style="display:flex;justify-content:space-between;margin-top:6px"><div class="muted-small">Tax (8%)</div><div id="tax">KES 0</div></div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px;font-weight:700"><div>Total</div><div id="total">KES 0</div></div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:10px">
+            <button id="saveOrderBtn" class="primary" style="flex:1">Save Order</button>
+            <button id="exportBtn" class="btn-ghost">Export CSV</button>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="clearCartBtn" class="btn-ghost" style="flex:1">Clear Cart</button>
+            <button id="loadSavedBtn" class="btn-ghost" style="flex:1">Load Saved</button>
+          </div>
+
+          <div style="margin-top:8px">
+            <select id="savedSelect" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(10,15,20,0.04)">
+              <option value="">-- Saved orders --</option>
+            </select>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button id="loadBtn" class="btn-ghost" style="flex:1">Load</button>
+              <button id="deleteBtn" class="btn-ghost" style="flex:1">Delete</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="footer">Built by Lynette • demo only — client-side, privacy-first</div>
+  </div>
+
+<script>
+/* ===== Realistic images (Wikimedia/Unsplash/Pexels, license-safe) ===== */
+const IMAGES = {
+  mandazi: "https://upload.wikimedia.org/wikipedia/commons/3/30/Mandazi_in_Kenya.jpg",
+  samosa: "https://upload.wikimedia.org/wikipedia/commons/3/3b/Samosas.jpg",
+  chips: "https://upload.wikimedia.org/wikipedia/commons/1/15/French_Fries_Plate.jpg",
+  smokie: "https://upload.wikimedia.org/wikipedia/commons/2/26/Sausage_in_bun.jpg",
+  pilau: "https://upload.wikimedia.org/wikipedia/commons/b/bc/Pilau_%28Kenya%29.jpg",
+  nyama: "https://upload.wikimedia.org/wikipedia/commons/3/34/Nyama_choma.jpg",
+  samaki: "https://upload.wikimedia.org/wikipedia/commons/1/14/Fried_Fish.jpg",
+  chapati: "https://upload.wikimedia.org/wikipedia/commons/1/14/Kenyan_Chapatis.jpg",
+  mandazi_bites: "https://upload.wikimedia.org/wikipedia/commons/9/9b/Mahamri.jpg",
+  doughnut: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Glazed_doughnut.jpg",
+  cake_slice: "https://upload.wikimedia.org/wikipedia/commons/a/a3/Strawberry_cake_slice.jpg",
+  ugali_beef: "https://upload.wikimedia.org/wikipedia/commons/1/1b/Ugali_with_beef_and_sukuma_wiki.jpg",
+  viazi_karai: "https://upload.wikimedia.org/wikipedia/commons/b/b1/Viazi_Karai.jpg",
+  mshakiki: "https://upload.wikimedia.org/wikipedia/commons/2/2b/Meat_Skewers.jpg",
+  tea: "https://upload.wikimedia.org/wikipedia/commons/4/4f/Chai_tea.jpg",
+  sausages: "https://upload.wikimedia.org/wikipedia/commons/1/12/Sausages_two_types.jpg"
+};
+
+/* ===== Menu data (with categories) ===== */
+const MENU = [
+  {id:'mandazi', name:'Mandazi (3 pcs)', cat:'Snacks', price:40, img:IMAGES.mandazi, desc:'Sweet fried dough'},
+  {id:'samosa', name:'Samosa (1 pc)', cat:'Snacks', price:50, img:IMAGES.samosa, desc:'Spicy beef or veggie'},
+  {id:'chips', name:'Chips (paper)', cat:'Snacks', price:70, img:IMAGES.chips, desc:'Street fries with chutney'},
+  {id:'smokie', name:'Smokie Kebab', cat:'Snacks', price:90, img:IMAGES.smokie, desc:'Skewered sausages'},
+
+  {id:'mandazi_bites', name:'Mandazi Bites', cat:'Desserts', price:80, img:IMAGES.mandazi_bites, desc:'Bite-size mandazi'},
+  {id:'doughnut', name:'Vanilla Doughnut', cat:'Desserts', price:60, img:IMAGES.doughnut, desc:'Light and soft doughnut'},
+  {id:'cake_slice', name:'Cake Slice', cat:'Desserts', price:120, img:IMAGES.cake_slice, desc:'Sweet celebration slice'},
+
+  {id:'pilau', name:'Pilau Box', cat:'Meals', price:300, img:IMAGES.pilau, desc:'Fragrant rice with meat'},
+  {id:'nyama', name:'Nyama Choma (small)', cat:'Meals', price:250, img:IMAGES.nyama, desc:'Grilled meat portion'},
+  {id:'ugali_beef', name:'Ugali & Beef', cat:'Meals', price:280, img:IMAGES.ugali_beef, desc:'Hearty local meal'},
+
+  {id:'samaki', name:'Fried Samaki', cat:'Coastal', price:280, img:IMAGES.samaki, desc:'Coastal fish favorite'},
+  {id:'mshakiki', name:'Mshakiki Skewers', cat:'Coastal', price:150, img:IMAGES.mshakiki, desc:'Flavorful skewers'},
+  {id:'viazi_karai', name:'Viazi Karai', cat:'Coastal', price:60, img:IMAGES.viazi_karai, desc:'Crispy potato bites'},
+
+  {id:'chapati', name:'Chapati (1 pc)', cat:'Breakfast', price:35, img:IMAGES.chapati, desc:'Soft flatbread'},
+  {id:'tea', name:'Chai (Tea)', cat:'Breakfast', price:25, img:IMAGES.tea, desc:'Sweet milky tea'},
+  {id:'sausages', name:'Breakfast Sausages', cat:'Breakfast', price:70, img:IMAGES.sausages, desc:'Pan-fried sausages'}
+];
+
+/* ===== App state ===== */
+let cart = {}; // id -> { item, qty }
+const TAX = 0.08;
+
+/* ===== Helpers ===== */
+const $ = id => document.getElementById(id);
+const currency = v => 'KES ' + Number(v).toLocaleString();
+function round(n){ return Math.round(n*100)/100; }
+
+/* ===== Categories & UI render ===== */
+const categories = Array.from(new Set(MENU.map(m=>m.cat)));
+categories.unshift('All');
+
+function renderTabs(){
+  const tabs = $('tabs'); tabs.innerHTML = '';
+  categories.forEach((c,i)=>{
+    const b = document.createElement('button');
+    b.className = 'tab' + (i===0 ? ' active' : '');
+    b.textContent = c;
+    b.onclick = ()=>{
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      b.classList.add('active');
+      renderMenu(c);
+    };
+    tabs.appendChild(b);
+  });
+}
+
+function renderMenu(cat='All'){
+  const grid = $('menuGrid'); grid.innerHTML = '';
+  const items = MENU.filter(m => cat === 'All' ? true : m.cat === cat);
+  $('categoryTitle').textContent = cat === 'All' ? 'All Items' : cat;
+  $('countBadge').textContent = `${items.length} items`;
+  items.forEach(item=>{
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.innerHTML = `
+      <div class="thumb"><img src="${item.img}" alt="${item.name}" loading="lazy"></div>
+      <div class="meta">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="title">${item.name}</div>
+            <div class="desc">${item.desc}</div>
+            <div class="price">${currency(item.price)}</div>
+          </div>
+          <div>
+            <button class="add" data-id="${item.id}">Add</button>
+          </div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(div);
+  });
+  Array.from(document.getElementsByClassName('add')).forEach(b=>b.onclick = ()=> addToCart(b.getAttribute('data-id')));
+}
+
+/* ===== Cart logic ===== */
+function addToCart(id, qty=1){
+  const item = MENU.find(m=>m.id===id);
+  if(!item) return;
+  if(cart[id]) cart[id].qty += qty;
+  else cart[id] = { item, qty };
+  renderCart();
+  saveLocalCart();
+}
+
+function setQty(id, q){
+  q = Number(q);
+  if(q <= 0) delete cart[id];
+  else cart[id].qty = q;
+  renderCart();
+  saveLocalCart();
+}
+
+function clearCart(){
+  cart = {};
+  renderCart();
+  localStorage.removeItem('ks_cart');
+}
+
+function computeTotals(){
+  let subtotal = 0;
+  for(const k in cart) subtotal += cart[k].item.price * cart[k].qty;
+  const tax = round(subtotal * TAX);
+  const total = round(subtotal + tax);
+  return { subtotal, tax, total };
+}
+
+/* ===== Render cart UI ===== */
+function renderCart(){
+  const list = $('cartList'); list.innerHTML = '';
+  const keys = Object.keys(cart);
+  if(keys.length === 0) $('cartStatus').textContent = 'Empty';
+  else $('cartStatus').textContent = `${keys.length} item(s)`;
+  keys.forEach(id=>{
+    const e = cart[id];
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="width:56px;height:44px;border-radius:8px;overflow:hidden;background:#f8fafb"><img src="${e.item.img}" style="width:100%;height:100%;object-fit:cover"></div>
+        <div>
+          <div style="font-weight:700">${e.item.name}</div>
+          <div class="muted-small">${currency(e.item.price)}</div>
+        </div>
+      </div>
+      <div class="qty">
+        <button class="btn-ghost qty-btn" data-id="${id}" data-op="-">-</button>
+        <div style="min-width:28px;text-align:center">${e.qty}</div>
+        <button class="btn-ghost qty-btn" data-id="${id}" data-op="+">+</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+  Array.from(document.getElementsByClassName('qty-btn')).forEach(b=>{
+    b.onclick = ()=> {
+      const id = b.getAttribute('data-id'), op = b.getAttribute('data-op');
+      if(op === '+') setQty(id, (cart[id].qty||0) + 1);
+      else setQty(id, (cart[id].qty||0) - 1);
+    };
+  });
+  const t = computeTotals();
+  $('subtotal').textContent = currency(t.subtotal);
+  $('tax').textContent = currency(t.tax);
+  $('total').textContent = currency(t.total);
+}
+
+/* ===== Local storage (cart) ===== */
+function saveLocalCart(){
+  try{ localStorage.setItem('ks_cart', JSON.stringify(cart)); }catch(e){}
+}
+function loadLocalCart(){
+  try{ cart = JSON.parse(localStorage.getItem('ks_cart') || '{}'); }catch(e){ cart = {}; }
+}
+
+/* ===== Saved orders ===== */
+function refreshSaved(){
+  const sel = $('savedSelect'); sel.innerHTML = '<option value="">-- Saved orders --</option>';
+  Object.keys(localStorage).forEach(k=>{
+    if(k.startsWith('ks_order_')){
+      const name = k.replace('ks_order_','');
+      const opt = document.createElement('option'); opt.value = k; opt.textContent = name;
+      sel.appendChild(opt);
+    }
+  });
+}
+function saveOrder(){
+  if(Object.keys(cart).length === 0) return alert('Cart is empty');
+  const name = prompt('Save order name (short):');
+  if(!name) return;
+  const payload = { savedAt: new Date().toISOString(), cart, totals: computeTotals() };
+  localStorage.setItem('ks_order_' + name, JSON.stringify(payload));
+  refreshSaved();
+  alert('Saved order: ' + name);
+}
+function loadOrder(){
+  const key = $('savedSelect').value;
+  if(!key) return alert('Choose saved order');
+  try{
+    const payload = JSON.parse(localStorage.getItem(key));
+    cart = payload.cart || {};
+    renderCart();
+    alert('Loaded ' + key.replace('ks_order_',''));
+  }catch(e){ alert('Load failed'); }
+}
+function deleteOrder(){
+  const key = $('savedSelect').value;
+  if(!key) return alert('Choose saved order');
+  if(confirm('Delete saved order?')){ localStorage.removeItem(key); refreshSaved(); }
+}
+
+/* ===== Export functions ===== */
+function exportCSV(name, payload){
+  const t = payload.totals || computeTotals();
+  let csv = 'item,unit_price,quantity,subtotal\\n';
+  for(const id in payload.cart){
+    const e = payload.cart[id];
+    csv += `"${e.item.name}",${e.item.price},${e.qty},${e.item.price * e.qty}\\n`;
+  }
+  csv += `,,Subtotal,${t.subtotal}\\n,,Tax,${t.tax}\\n,,Total,${t.total}\\n`;
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = (name || 'order') + '.csv'; a.click(); URL.revokeObjectURL(url);
+}
+function exportAllSaved(){
+  const out = {};
+  Object.keys(localStorage).forEach(k=>{
+    if(k.startsWith('ks_order_')) out[k] = JSON.parse(localStorage.getItem(k));
+  });
+  const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'saved_orders.json'; a.click(); URL.revokeObjectURL(url);
+}
+
+/* ===== UI events wiring ===== */
+$('saveBtn').addEventListener('click', saveOrder);
+$('exportAllBtn').addEventListener('click', exportAllSaved);
+$('clearLocalBtn').addEventListener('click', ()=>{ if(confirm('Clear all saved orders?')){ Object.keys(localStorage).forEach(k=>{ if(k.startsWith('ks_order_')) localStorage.removeItem(k)}); refreshSaved(); }});
+
+$('saveOrderBtn').addEventListener('click', saveOrder);
+$('exportBtn').addEventListener('click', ()=>{ if(Object.keys(cart).length===0) return alert('Cart empty'); const name = prompt('Filename (optional):','order_summary'); exportCSV(name, {cart, totals: computeTotals()});});
+$('clearCartBtn').addEventListener('click', ()=>{ if(confirm('Clear cart?')) clearCart();});
+$('loadSavedBtn').addEventListener('click', ()=>{ refreshSaved(); alert('Saved orders listed in the dropdown'); });
+$('loadBtn').addEventListener('click', loadOrder);
+$('deleteBtn').addEventListener('click', deleteOrder);
+
+/* ===== Initialization ===== */
+function init(){
+  renderTabs();
+  renderMenu('All');
+  loadLocalCart();
+  renderCart();
+  refreshSaved();
+}
+init();
+
+/* keyboard shortcut ctrl/cmd + s saves order */
+document.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key.toLowerCase() === 's'){ e.preventDefault(); saveOrder(); }});
+</script>
+</body>
+</html>
